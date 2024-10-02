@@ -1,0 +1,61 @@
+metricBenchmark:
+  replicaCount: 1
+  image:
+    repository: kampkelly/metric-benchmark
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+
+metricSimulator:
+  replicaCount: 1
+  image:
+    repository: kampkelly/metric-simulator
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+
+ingress:
+  enabled: true
+  className: "nginx"
+  hosts:
+    - host: llm-benchmark.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  architecture: standalone
+  master:
+    service:
+      port: 6379
+
+postgresql:
+  enabled: true
+  global:
+    postgresql:
+      auth:
+        username: runor
+        password: "postgres"
+        postgresPassword: "postgres"
+        database: llm_benchmark
+
+configMap:
+  POSTGRES_USER: runor
+  POSTGRES_HOST: "llm-benchmark-postgresql"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: llm_benchmark
+  SCHEDULE_INTERVAL: "1"
+  REDIS_HOST: "llm-benchmark-redis-master"
+  REDIS_PORT: "6379"
+  SEED: ""
+
+secrets:
+  POSTGRES_PASSWORD: postgres
+  API_KEY: ""

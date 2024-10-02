@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-metric-benchmark
+spec:
+  replicas: {{ .Values.metricBenchmark.replicaCount }}
+  selector:
+    matchLabels:
+      app: metric-benchmark
+  template:
+    metadata:
+      labels:
+        app: metric-benchmark
+    spec:
+      containers:
+        - name: metric-benchmark
+          image: "{{ .Values.metricBenchmark.image.repository }}:{{ .Values.metricBenchmark.image.tag }}"
+          imagePullPolicy: {{ .Values.metricBenchmark.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+            - secretRef:
+                name: {{ .Release.Name }}-secrets

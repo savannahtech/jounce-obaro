@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-metric-simulator
+spec:
+  replicas: {{ .Values.metricSimulator.replicaCount }}
+  selector:
+    matchLabels:
+      app: metric-simulator
+  template:
+    metadata:
+      labels:
+        app: metric-simulator
+    spec:
+      containers:
+        - name: metric-simulator
+          image: "{{ .Values.metricSimulator.image.repository }}:{{ .Values.metricSimulator.image.tag }}"
+          imagePullPolicy: {{ .Values.metricSimulator.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+            - secretRef:
+                name: {{ .Release.Name }}-secrets
